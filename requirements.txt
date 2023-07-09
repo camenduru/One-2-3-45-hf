@@ -59,6 +59,7 @@ zarr
 sapien
 pyglet==1.5.27
 wis3d
+gdown
 git+https://github.com/NVlabs/nvdiffrast.git
 # shap-e
 git+https://github.com/openai/shap-e@8625e7c

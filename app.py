@@ -5,7 +5,8 @@ python gradio_new.py 0
 '''
 import os, sys
 from huggingface_hub import snapshot_download
-code_dir = snapshot_download("One-2-3-45/code", token=os.environ['TOKEN'])
+# code_dir = snapshot_download("One-2-3-45/code", token=os.environ['TOKEN'])
+code_dir = "../code"
 sys.path.append(code_dir)
 
 elev_est_dir = os.path.join(code_dir, "one2345_elev_est/")
@@ -451,6 +452,7 @@ def on_coords_slider(image, x_min, y_min, x_max, y_max, color=(88, 191, 131, 255
     print("on_coords_slider, image_size:", np.array(image).shape)
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGBA2BGRA)
     image = cv2.rectangle(image, (x_min, y_min), (x_max, y_max), color, int(max(max(image.shape) / 400*2, 2)))
+    print("on_coords_slider, done")
     return cv2.cvtColor(image, cv2.COLOR_BGRA2RGBA) # image[:, :, ::-1]
 
 def save_img(image):
@@ -638,7 +640,7 @@ def run_demo(
         def refresh(tmp_dir):
             if os.path.exists(tmp_dir):
                 shutil.rmtree(tmp_dir)
-            tmp_dir = tempfile.TemporaryDirectory(dir="./demo_tmp")
+            tmp_dir = tempfile.TemporaryDirectory(dir=os.path.join(os.path.dirname(__file__), 'demo_tmp'))
             print("create tmp_dir", tmp_dir.name)
             clear = [gr.update(value=[])] + [None] * 6 +  [gr.update(visible=False)] * 2 + [None] * 8 + [gr.update(value=False)] * 8
             return (tmp_dir.name, *clear)
