@@ -8,9 +8,12 @@ from huggingface_hub import snapshot_download
 code_dir = snapshot_download("One-2-3-45/code", token=os.environ['TOKEN'])
 sys.path.append(code_dir)
 
+elev_est_dir = os.path.join(code_dir, "one2345_elev_est/")
+sys.path.append(elev_est_dir)
+
 import subprocess
 
-subprocess.run(["sh", os.path.join(code_dir, "one2345_elev_est/install.sh")], cwd=os.path.join(code_dir, "one2345_elev_est/"))
+subprocess.run(["sh", os.path.join(elev_est_dir, "install.sh")], cwd=elev_est_dir)
 
 
 import shutil
