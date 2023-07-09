@@ -5,8 +5,8 @@ python gradio_new.py 0
 '''
 import os, sys
 from huggingface_hub import snapshot_download
-# code_dir = snapshot_download("One-2-3-45/code", token=os.environ['TOKEN'])
-code_dir = "../code"
+code_dir = snapshot_download("One-2-3-45/code", token=os.environ['TOKEN'])
+# code_dir = "../code"
 sys.path.append(code_dir)
 
 elev_est_dir = os.path.join(code_dir, "one2345_elev_est/")
