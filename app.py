@@ -12,8 +12,15 @@ sys.path.append(code_dir)
 elev_est_dir = os.path.join(code_dir, "one2345_elev_est/")
 sys.path.append(elev_est_dir)
 
+sparseneus_dir = os.path.join(code_dir, "SparseNeuS_demo_v1/")
+sys.path.append(sparseneus_dir)
+
 import subprocess
 subprocess.run(["sh", os.path.join(elev_est_dir, "install.sh")], cwd=elev_est_dir)
+# export TORCH_CUDA_ARCH_LIST="7.0;7.2;8.0;8.6"
+# export IABN_FORCE_CUDA=1
+os.environ["TORCH_CUDA_ARCH_LIST"] = "7.0;7.2;8.0;8.6"
+os.environ["IABN_FORCE_CUDA"] = "1"
 subprocess.run(["pip", "install", "inplace_abn"]) 
 
 import inspect
