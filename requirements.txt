@@ -1,5 +1,5 @@
-
 # sparseneus
+-r env.sh
 -e git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0#egg=torchsparse
 opencv_python
 trimesh
@@ -9,5 +9,6 @@ icecream
 tqdm
 scipy
 PyMCubes
+ninja
 # sudo apt-get install libsparsehash-dev
 inplace_abn
