@@ -7,6 +7,11 @@ import os, sys
 from huggingface_hub import snapshot_download
 sys.path.append(snapshot_download("One-2-3-45/code", token=os.environ['TOKEN']))
 
+import subprocess
+
+subprocess.run(["./one2345_elev_est/install.sh"], cwd="./one2345_elev_est/")
+
+
 import shutil
 import torch
 import fire
