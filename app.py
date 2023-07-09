@@ -13,8 +13,8 @@ elev_est_dir = os.path.join(code_dir, "one2345_elev_est/")
 sys.path.append(elev_est_dir)
 
 import subprocess
-
 subprocess.run(["sh", os.path.join(elev_est_dir, "install.sh")], cwd=elev_est_dir)
+subprocess.run(["pip", "install", "inplace_abn"]) 
 
 import inspect
 import shutil
