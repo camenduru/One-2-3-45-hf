@@ -452,7 +452,6 @@ def on_coords_slider(image, x_min, y_min, x_max, y_max, color=(88, 191, 131, 255
     print("on_coords_slider, image_size:", np.array(image).shape)
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGBA2BGRA)
     image = cv2.rectangle(image, (x_min, y_min), (x_max, y_max), color, int(max(max(image.shape) / 400*2, 2)))
-    print("on_coords_slider, done")
     return cv2.cvtColor(image, cv2.COLOR_BGRA2RGBA) # image[:, :, ::-1]
 
 def save_img(image):
@@ -583,14 +582,14 @@ def run_demo(
                     steps_slider = gr.Slider(5, 200, value=75, step=5,
                                              label='Number of diffusion inference steps')
 
-                with gr.Row():
-                    run_btn = gr.Button('Run Generation', variant='primary')
+                # with gr.Row():
+                run_btn = gr.Button('Run Generation', variant='primary')
                 # guide_title = gr.Markdown(_GUIDE_TITLE, visible=True)
                 guide_text = gr.Markdown(_USER_GUIDE, visible=True)
 
-                with gr.Row():
+                # with gr.Row():
                     # height does not work [a bug]
-                    mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out") #.style(height=800)
+                mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out") #.style(height=800)
         
         with gr.Row(variant='panel'):
             with gr.Column(scale=0.85):
@@ -647,19 +646,19 @@ def run_demo(
         
         placeholder = gr.Image(visible=False)
         tmp_func = lambda x: False if not x else gr.update(visible=False)
-        disable_func = lambda *args: [gr.update(interactive=False)] * len(args)
-        enable_func = lambda *args: [gr.update(interactive=True)] * len(args)
+        disable_func = lambda x: gr.update(interactive=False)
+        enable_func = lambda x: gr.update(interactive=True)
         image_block.change(fn=refresh,
                            inputs=[tmp_dir],
                            outputs=[tmp_dir, rerun_idx, bbox_block, sam_block, elev_output, vis_output, mesh_output, regen_view_btn, regen_mesh_btn, *views, *btn_retrys]
-                           ).success(disable_func, inputs=[run_btn], outputs=[run_btn]
+                           ).success(disable_func, inputs=run_btn, outputs=run_btn
                            ).success(fn=tmp_func, inputs=[image_block], outputs=[placeholder]
                            ).success(fn=partial(update_guide, _BBOX_1), outputs=[guide_text]
                            ).success(fn=save_img,
                                      inputs=[image_block],
                                      outputs=[bbox_block, *bbox_sliders]
                            ).success(fn=partial(update_guide, _BBOX_3), outputs=[guide_text]
-                           ).success(enable_func, inputs=[run_btn], outputs=[run_btn])
+                           ).success(enable_func, inputs=run_btn, outputs=run_btn)
 
 
         for bbox_slider in bbox_sliders:
