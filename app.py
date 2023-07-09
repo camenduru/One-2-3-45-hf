@@ -15,7 +15,7 @@ import subprocess
 
 subprocess.run(["sh", os.path.join(elev_est_dir, "install.sh")], cwd=elev_est_dir)
 
-
+import inspect
 import shutil
 import torch
 import fire
@@ -299,12 +299,14 @@ def stage2_run(models, device, tmp_dir,
         zero123_infer(models['turncam'], tmp_dir, indices=rerun_all, device=device, ddim_steps=stage2_steps, scale=scale)
     
     dataset = tmp_dir
-    os.chdir('./SparseNeuS_demo_v1/')
+    main_dir_path = os.path.dirname(os.path.abspath(
+            inspect.getfile(inspect.currentframe())))
+    os.chdir(os.path.join(code_dir, 'SparseNeuS_demo_v1/'))
 
     bash_script = f'CUDA_VISIBLE_DEVICES={_GPU_INDEX} python exp_runner_generic_blender_val.py --specific_dataset_name {dataset} --mode export_mesh --conf confs/one2345_lod0_val_demo.conf  --is_continue'
     print(bash_script)
     os.system(bash_script)
-    os.chdir("../")
+    os.chdir(main_dir_path)
 
     ply_path = os.path.join(tmp_dir, f"meshes_val_bg/lod0/mesh_00340000_gradio_lod0.ply")
     mesh_path = os.path.join(tmp_dir, "mesh.obj")
