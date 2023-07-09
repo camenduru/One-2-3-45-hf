@@ -642,7 +642,7 @@ def run_demo(
                 shutil.rmtree(tmp_dir)
             tmp_dir = tempfile.TemporaryDirectory(dir=os.path.join(os.path.dirname(__file__), 'demo_tmp'))
             print("create tmp_dir", tmp_dir.name)
-            clear = [gr.update(value=[])] + [None] * 6 +  [gr.update(visible=False)] * 2 + [None] * 8 + [gr.update(value=False)] * 8
+            clear = [gr.update(value=[])] + [None] * 5 + [gr.update(visible=False)] * 2 + [None] * 8 + [gr.update(value=False)] * 8
             return (tmp_dir.name, *clear)
         
         placeholder = gr.Image(visible=False)
