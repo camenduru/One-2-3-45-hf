@@ -1,0 +1,74 @@
+# --extra-index-url https://download.pytorch.org/whl/cu113
+torch>=1.12.1
+torchvision>=0.13.1
+albumentations>=0.4.3
+opencv-python>=4.5.5.64
+pudb>=2019.2
+imageio>=2.9.0
+imageio-ffmpeg>=0.4.2
+pytorch-lightning>=1.4.2
+omegaconf>=2.1.1
+test-tube>=0.7.5
+streamlit>=0.73.1
+einops>=0.3.0
+torch-fidelity>=0.3.0
+transformers>=4.22.2
+kornia>=0.6
+webdataset>=0.2.5
+torchmetrics>=0.6.0
+fire>=0.4.0
+gradio>=3.21.0
+diffusers>=0.12.1
+datasets[vision]>=2.4.0
+carvekit-colab>=4.1.0
+rich>=13.3.2
+lovely-numpy>=0.2.8
+lovely-tensors>=0.1.14
+plotly>=5.13.1
+-e git+https://github.com/CompVis/taming-transformers.git#egg=taming-transformers
+# elev est
+dl_ext
+easydict
+glumpy
+gym
+h5py
+imageio
+loguru
+matplotlib
+# mplib
+multipledispatch
+open3d
+packaging
+Pillow
+pycocotools
+motion-planning
+pyrender
+PyYAML
+scikit_image
+scikit_learn
+scipy
+screeninfo
+setuptools
+tensorboardX
+termcolor
+tqdm
+transforms3d
+trimesh
+yacs
+zarr
+sapien
+pyglet==1.5.27
+wis3d
+gdown
+git+https://github.com/NVlabs/nvdiffrast.git
+# shap-e
+git+https://github.com/openai/shap-e@8625e7c
+# segment anything
+opencv-python
+pycocotools 
+matplotlib 
+onnxruntime 
+onnx
+git+https://github.com/facebookresearch/segment-anything.git
+# rembg
+rembg
