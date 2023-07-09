@@ -491,7 +491,7 @@ def run_demo(
         print('new device_idx:', device_idx)
 
     device = f"cuda:{device_idx}" if torch.cuda.is_available() else "cpu"
-    models = init_model(device, ckpt)
+    models = init_model(device, os.path.join(code_dir, ckpt))
     # model = models['turncam']
     # sampler = DDIMSampler(model)
 
