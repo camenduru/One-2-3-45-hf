@@ -27,7 +27,7 @@ lovely-tensors>=0.1.14
 plotly>=5.13.1
 -e git+https://github.com/CompVis/taming-transformers.git#egg=taming-transformers
 # sparseneus
-git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0
+-e git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0
 opencv_python
 trimesh
 numpy
