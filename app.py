@@ -251,11 +251,12 @@ def stage1_run(models, device, cam_vis, tmp_dir,
                input_im, scale, ddim_steps, elev=None, rerun_all=[],
                *btn_retrys):
     is_rerun = True if cam_vis is None else False
+    model = models['turncam'].half()
 
     stage1_dir = os.path.join(tmp_dir, "stage1_8")
     if not is_rerun:
         os.makedirs(stage1_dir, exist_ok=True)
-        output_ims = predict_stage1_gradio(models['turncam'], input_im, save_path=stage1_dir, adjust_set=list(range(4)), device=device, ddim_steps=ddim_steps, scale=scale)
+        output_ims = predict_stage1_gradio(model, input_im, save_path=stage1_dir, adjust_set=list(range(4)), device=device, ddim_steps=ddim_steps, scale=scale)
         stage2_steps = 50 # ddim_steps
         zero123_infer(models['turncam'], tmp_dir, indices=[0], device=device, ddim_steps=stage2_steps, scale=scale)
         elev_output = estimate_elev(tmp_dir)
@@ -266,9 +267,9 @@ def stage1_run(models, device, cam_vis, tmp_dir,
 
         flag_lower_cam = elev_output <= 75
         if flag_lower_cam:
-            output_ims_2 = predict_stage1_gradio(models['turncam'], input_im, save_path=stage1_dir, adjust_set=list(range(4,8)), device=device, ddim_steps=ddim_steps, scale=scale)
+            output_ims_2 = predict_stage1_gradio(model, input_im, save_path=stage1_dir, adjust_set=list(range(4,8)), device=device, ddim_steps=ddim_steps, scale=scale)
         else:
-            output_ims_2 = predict_stage1_gradio(models['turncam'], input_im, save_path=stage1_dir, adjust_set=list(range(8,12)), device=device, ddim_steps=ddim_steps, scale=scale)
+            output_ims_2 = predict_stage1_gradio(model, input_im, save_path=stage1_dir, adjust_set=list(range(8,12)), device=device, ddim_steps=ddim_steps, scale=scale)
         torch.cuda.empty_cache()
         return (90-elev_output, new_fig, *output_ims, *output_ims_2)
     else:
@@ -283,7 +284,7 @@ def stage1_run(models, device, cam_vis, tmp_dir,
             if idx not in rerun_all:
                 rerun_all.append(idx)
         print("rerun_idx", rerun_all)
-        output_ims = predict_stage1_gradio(models['turncam'], input_im, save_path=stage1_dir, adjust_set=rerun_idx_in, device=device, ddim_steps=ddim_steps, scale=scale)
+        output_ims = predict_stage1_gradio(model, input_im, save_path=stage1_dir, adjust_set=rerun_idx_in, device=device, ddim_steps=ddim_steps, scale=scale)
         outputs = [gr.update(visible=True)] * 8
         for idx, view_idx in enumerate(rerun_idx):
             outputs[view_idx] = output_ims[idx]
@@ -296,11 +297,12 @@ def stage2_run(models, device, tmp_dir,
     # print("elev", elev)
     flag_lower_cam = 90-int(elev["label"]) <= 75
     is_rerun = True if rerun_all else False
+    model = models['turncam'].half()
     if not is_rerun:
         if flag_lower_cam:
-            zero123_infer(models['turncam'], tmp_dir, indices=list(range(1,8)), device=device, ddim_steps=stage2_steps, scale=scale)
+            zero123_infer(model, tmp_dir, indices=list(range(1,8)), device=device, ddim_steps=stage2_steps, scale=scale)
         else:
-            zero123_infer(models['turncam'], tmp_dir, indices=list(range(1,4))+list(range(8,12)), device=device, ddim_steps=stage2_steps, scale=scale)
+            zero123_infer(model, tmp_dir, indices=list(range(1,4))+list(range(8,12)), device=device, ddim_steps=stage2_steps, scale=scale)
     else:
         print("rerun_idx", rerun_all)
         zero123_infer(models['turncam'], tmp_dir, indices=rerun_all, device=device, ddim_steps=stage2_steps, scale=scale)
