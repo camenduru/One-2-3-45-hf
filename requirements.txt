@@ -1,5 +1,5 @@
 # sparseneus
--e git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0#egg=torchsparse
+# -e git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0#egg=torchsparse
 opencv_python
 trimesh
 numpy
