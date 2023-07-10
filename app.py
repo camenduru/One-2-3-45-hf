@@ -24,7 +24,7 @@ if not is_local_run:
     os.environ["IABN_FORCE_CUDA"] = "1"
     subprocess.run(["pip", "install", "inplace_abn"]) 
     # FORCE_CUDA=1 pip install --no-cache-dir git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0
-    subprocess.run(["FORCE_CUDA=1", "pip", "install", "--no-cache-dir", "git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0"])
+    subprocess.run(["pip", "install", "--no-cache-dir", "git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0"], env={"FORCE_CUDA": "1"})
 
 import inspect
 import shutil
