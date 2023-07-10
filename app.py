@@ -6,7 +6,7 @@ python gradio_new.py 0
 import os, sys
 from huggingface_hub import snapshot_download
 
-is_local_run = True
+is_local_run = False
 
 code_dir = snapshot_download("One-2-3-45/code", token=os.environ['TOKEN']) if not is_local_run else "../code"
 
