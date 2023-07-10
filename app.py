@@ -55,16 +55,16 @@ _DESCRIPTION = '''
 We reconstruct a 3D textured mesh from a single image by initially predicting multi-view images and then lifting them to 3D.
 '''
 
-_USER_GUIDE = "Please upload an image in the top left block (or choose an example above) and click **Run Generation**." 
+_USER_GUIDE = "Please upload an image in the block above (or choose an example above) and click **Run Generation**." 
 _BBOX_1 = "Predicting bounding box for the input image..."
 _BBOX_2 = "Bounding box adjusted. Continue adjusting or **Run Generation**."
 _BBOX_3 = "Bounding box predicted. Adjust it using sliders or **Run Generation**."
 _SAM = "Preprocessing the input image... (safety check, SAM segmentation, *etc*.)"
-_GEN_1 = "Predicting multi-view images... (may take \~23 seconds) <br> Images will be shown in the bottom right blocks."
-_GEN_2 = "Predicting nearby views and generating mesh... (may take \~48 seconds) <br> Mesh will be shown below."
-_DONE = "Done! Mesh is shown below. <br> If it is not satisfactory, please select **Retry view** checkboxes for inaccurate views and click **Regenerate selected view(s)** at the bottom."
+_GEN_1 = "Predicting multi-view images... (may take \~21 seconds) <br> Images will be shown in the bottom right blocks."
+_GEN_2 = "Predicting nearby views and generating mesh... (may take \~43 seconds) <br> Mesh will be shown on the right."
+_DONE = "Done! Mesh is shown on the right. <br> If it is not satisfactory, please select **Retry view** checkboxes for inaccurate views and click **Regenerate selected view(s)** at the bottom."
 _REGEN_1 = "Selected view(s) are regenerated. You can click **Regenerate nearby views and mesh**. <br> Alternatively, if the regenerated view(s) are still not satisfactory, you can repeat the previous step (select the view and regenerate)."
-_REGEN_2 = "Regeneration done. <br> Mesh is shown below."
+_REGEN_2 = "Regeneration done. Mesh is shown on the right."
 
 class CameraVisualizer:
     def __init__(self, gradio_plot):
@@ -197,7 +197,7 @@ class CameraVisualizer:
                 # width=640,
                 # height=480,
                 # height=400,
-                height=360,
+                height=450,
                 autosize=True,
                 hovermode=False,
                 margin=go.layout.Margin(l=0, r=0, b=0, t=0),
@@ -279,7 +279,7 @@ def stage1_run(models, device, cam_vis, tmp_dir,
         rerun_idx = [i for i in range(len(btn_retrys)) if btn_retrys[i]]
         # elev_output = estimate_elev(tmp_dir)
         # if elev_output > 75:
-        if 90-elev > 75:
+        if 90-int(elev["label"]) > 75:
             rerun_idx_in = [i if i < 4 else i+4 for i in rerun_idx]
         else:
             rerun_idx_in = rerun_idx
@@ -525,89 +525,53 @@ def run_demo(
 
 
     # Compose demo layout & data flow.
-    css="#model-3d-out {height: 400px;}"
+    css = "#model-3d-out {height: 400px;} #plot-out {height: 425px;}"
     with gr.Blocks(title=_TITLE, css=css) as demo:
         gr.Markdown('# ' + _TITLE)
         gr.Markdown(_DESCRIPTION)
 
         with gr.Row(variant='panel'):
-            with gr.Column(scale=0.85):
-                image_block = gr.Image(type='pil', image_mode='RGBA', label='Input image', tool=None)
-                with gr.Row():
-                    bbox_block = gr.Image(type='pil', label="Bounding box", interactive=False).style(height=300)
-                    sam_block = gr.Image(type='pil', label="SAM output", interactive=False)
-                max_width = max_height = 256
-                with gr.Row():
-                    x_min_slider = gr.Slider(
-                        label="X min",
-                        interactive=True,
-                        value=0,
-                        minimum=0,
-                        maximum=max_width,
-                        step=1,
-                    )
-                    y_min_slider = gr.Slider(
-                        label="Y min",
-                        interactive=True,
-                        value=0,
-                        minimum=0,
-                        maximum=max_height,
-                        step=1,
-                    )
-                with gr.Row():
-                    x_max_slider = gr.Slider(
-                        label="X max",
-                        interactive=True,
-                        value=max_width,
-                        minimum=0,
-                        maximum=max_width,
-                        step=1,
-                    )
-                    y_max_slider = gr.Slider(
-                        label="Y max",
-                        interactive=True,
-                        value=max_height,
-                        minimum=0,
-                        maximum=max_height,
-                        step=1,
-                    )
-                    bbox_sliders = [x_min_slider, y_min_slider, x_max_slider, y_max_slider]
+            with gr.Column(scale=1.2):
+                image_block = gr.Image(type='pil', image_mode='RGBA', label='Input image', tool=None).style(height=290)
 
-                
-            with gr.Column(scale=1.15):
                 gr.Examples(
                     examples=examples_full,  # NOTE: elements must match inputs list!
-                    # fn=save_img,
-                    fn=lambda x: x,
                     inputs=[image_block],
-                    # outputs=[image_block, bbox_block, *bbox_sliders],
                     outputs=[image_block],
                     cache_examples=False,
-                    run_on_click=True,
                     label='Examples (click one of the images below to start)',
                 )
-                preprocess_chk = gr.Checkbox(
-                    True, label='Reduce image contrast (mitigate shadows on the backside)')
-
+                
                 with gr.Accordion('Advanced options', open=False):
+                    preprocess_chk = gr.Checkbox(
+                        False, label='Reduce image contrast (mitigate shadows on the backside)')
                     scale_slider = gr.Slider(0, 30, value=3, step=1,
                                              label='Diffusion guidance scale')
                     steps_slider = gr.Slider(5, 200, value=75, step=5,
                                              label='Number of diffusion inference steps')
 
-                # with gr.Row():
                 run_btn = gr.Button('Run Generation', variant='primary', interactive=False)
-                # guide_title = gr.Markdown(_GUIDE_TITLE, visible=True)
                 guide_text = gr.Markdown(_USER_GUIDE, visible=True)
+                
+            with gr.Column(scale=.8):
+                with gr.Row():
+                    bbox_block = gr.Image(type='pil', label="Bounding box", interactive=False).style(height=290)
+                    sam_block = gr.Image(type='pil', label="SAM output", interactive=False)
+                max_width = max_height = 256
+                with gr.Row():
+                    x_min_slider = gr.Slider(label="X min", interactive=True, value=0, minimum=0, maximum=max_width, step=1)
+                    y_min_slider = gr.Slider(label="Y min", interactive=True, value=0, minimum=0, maximum=max_height, step=1)
+                with gr.Row():
+                    x_max_slider = gr.Slider(label="X max", interactive=True, value=max_width, minimum=0, maximum=max_width, step=1)
+                    y_max_slider = gr.Slider(label="Y max", interactive=True, value=max_height, minimum=0, maximum=max_height, step=1)
+                bbox_sliders = [x_min_slider, y_min_slider, x_max_slider, y_max_slider]
 
                 mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
         
         with gr.Row(variant='panel'):
             with gr.Column(scale=0.85):
-                with gr.Row():
-                    elev_output = gr.Label(label='Estimated elevation (degree, w.r.t. the horizontal plane)')
-                vis_output = gr.Plot(
-                    label='Camera poses of the input view (red) and predicted views (blue)')
+                elev_output = gr.Label(label='Estimated elevation (degree, w.r.t. the horizontal plane)')
+                vis_output = gr.Plot(label='Camera poses of the input view (red) and predicted views (blue)', elem_id="plot-out")
                 
             with gr.Column(scale=1.15):
                 gr.Markdown('Predicted multi-view images')
@@ -631,7 +595,6 @@ def run_demo(
                     btn_retry_6 = gr.Checkbox(label='Retry view 6')
                     btn_retry_7 = gr.Checkbox(label='Retry view 7')
                     btn_retry_8 = gr.Checkbox(label='Retry view 8')
-                # regen_btn = gr.Button('Regenerate selected views and mesh', variant='secondary', visible=False)
                 with gr.Row():
                     regen_view_btn = gr.Button('1. Regenerate selected view(s)', variant='secondary', visible=False)
                     regen_mesh_btn = gr.Button('2. Regenerate nearby views and mesh', variant='secondary', visible=False)
@@ -683,12 +646,10 @@ def run_demo(
         def on_retry_button_click(*btn_retrys):
             any_checked = any([btn_retry for btn_retry in btn_retrys])
             print('any_checked:', any_checked, [btn_retry for btn_retry in btn_retrys])
-            # return regen_btn.update(visible=any_checked)
             if any_checked:
                 return (gr.update(visible=True), gr.update(visible=True))
             else:
                 return (gr.update(), gr.update())
-            # return regen_view_btn.update(visible=any_checked), regen_mesh_btn.update(visible=any_checked)
         # make regen_btn visible when any of the btn_retry is checked
         for btn_retry in btn_retrys:
             # Add the event handlers to the btn_retry buttons
