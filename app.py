@@ -5,23 +5,24 @@ python gradio_new.py 0
 '''
 import os, sys
 from huggingface_hub import snapshot_download
-code_dir = snapshot_download("One-2-3-45/code", token=os.environ['TOKEN'])
-# code_dir = "../code"
+
+is_local_run = True
+
+code_dir = snapshot_download("One-2-3-45/code", token=os.environ['TOKEN']) if not is_local_run else "../code"
+
 sys.path.append(code_dir)
 
 elev_est_dir = os.path.join(code_dir, "one2345_elev_est/")
 sys.path.append(elev_est_dir)
 
-# sparseneus_dir = os.path.join(code_dir, "SparseNeuS_demo_v1/")
-# sys.path.append(sparseneus_dir)
-
-import subprocess
-subprocess.run(["sh", os.path.join(elev_est_dir, "install.sh")], cwd=elev_est_dir)
-# export TORCH_CUDA_ARCH_LIST="7.0;7.2;8.0;8.6"
-# export IABN_FORCE_CUDA=1
-os.environ["TORCH_CUDA_ARCH_LIST"] = "7.0;7.2;8.0;8.6"
-os.environ["IABN_FORCE_CUDA"] = "1"
-subprocess.run(["pip", "install", "inplace_abn"]) 
+if not is_local_run:
+    import subprocess
+    subprocess.run(["sh", os.path.join(elev_est_dir, "install.sh")], cwd=elev_est_dir)
+    # export TORCH_CUDA_ARCH_LIST="7.0;7.2;8.0;8.6"
+    # export IABN_FORCE_CUDA=1
+    os.environ["TORCH_CUDA_ARCH_LIST"] = "8.0;8.6"
+    os.environ["IABN_FORCE_CUDA"] = "1"
+    subprocess.run(["pip", "install", "inplace_abn"]) 
 
 import inspect
 import shutil
@@ -36,13 +37,12 @@ import sys
 from functools import partial
 
 from lovely_numpy import lo
-# from omegaconf import OmegaConf
 import cv2
 from PIL import Image
 import trimesh
 import tempfile
 from zero123_utils import init_model, predict_stage1_gradio, zero123_infer
-from sam_utils import sam_init, sam_out, sam_out_nosave
+from sam_utils import sam_init, sam_out_nosave
 from utils import image_preprocess_nosave, gen_poses
 from one2345_elev_est.tools.estimate_wild_imgs import estimate_elev
 from rembg import remove
@@ -51,7 +51,6 @@ _GPU_INDEX = 0
 
 _TITLE = 'One-2-3-45: Any Single Image to 3D Mesh in 45 Seconds without Per-Shape Optimization'
 
-# This demo allows you to generate novel viewpoints of an object depicted in an input image using a fine-tuned version of Stable Diffusion.
 _DESCRIPTION = '''
 We reconstruct a 3D textured mesh from a single image by initially predicting multi-view images and then lifting them to 3D.
 '''
@@ -252,7 +251,7 @@ class CameraVisualizer:
     
 
 def stage1_run(models, device, cam_vis, tmp_dir,
-               input_im, scale, ddim_steps, rerun_all=[],
+               input_im, scale, ddim_steps, elev=None, rerun_all=[],
                *btn_retrys):
     is_rerun = True if cam_vis is None else False
 
@@ -273,11 +272,12 @@ def stage1_run(models, device, cam_vis, tmp_dir,
             output_ims_2 = predict_stage1_gradio(models['turncam'], input_im, save_path=stage1_dir, adjust_set=list(range(4,8)), device=device, ddim_steps=ddim_steps, scale=scale)
         else:
             output_ims_2 = predict_stage1_gradio(models['turncam'], input_im, save_path=stage1_dir, adjust_set=list(range(8,12)), device=device, ddim_steps=ddim_steps, scale=scale)
-        return (elev_output, new_fig, *output_ims, *output_ims_2)
+        return (90-elev_output, new_fig, *output_ims, *output_ims_2)
     else:
         rerun_idx = [i for i in range(len(btn_retrys)) if btn_retrys[i]]
-        elev_output = estimate_elev(tmp_dir)
-        if elev_output > 75:
+        # elev_output = estimate_elev(tmp_dir)
+        # if elev_output > 75:
+        if 90-elev >75:
             rerun_idx_in = [i if i < 4 else i+4 for i in rerun_idx]
         else:
             rerun_idx_in = rerun_idx
@@ -295,7 +295,7 @@ def stage1_run(models, device, cam_vis, tmp_dir,
 def stage2_run(models, device, tmp_dir,
                elev, scale, rerun_all=[], stage2_steps=50):
     # print("elev", elev)
-    flag_lower_cam = int(elev["label"]) <= 75
+    flag_lower_cam = 90-int(elev["label"]) <= 75
     is_rerun = True if rerun_all else False
     if not is_rerun:
         if flag_lower_cam:
@@ -529,8 +529,6 @@ def run_demo(
                     bbox_block = gr.Image(type='pil', label="Bounding box", interactive=False).style(height=300)
                     sam_block = gr.Image(type='pil', label="SAM output", interactive=False)
                 max_width = max_height = 256
-                # with gr.Row():
-                #     gr.Markdown('After uploading the image, a bounding box will be generated automatically. If the result is not satisfactory, you can also use the slider below to manually select the object.')
                 with gr.Row():
                     x_min_slider = gr.Slider(
                         label="X min",
@@ -590,21 +588,16 @@ def run_demo(
                                              label='Number of diffusion inference steps')
 
                 # with gr.Row():
-                run_btn = gr.Button('Run Generation', variant='primary')
+                run_btn = gr.Button('Run Generation', variant='primary', interactive=False)
                 # guide_title = gr.Markdown(_GUIDE_TITLE, visible=True)
                 guide_text = gr.Markdown(_USER_GUIDE, visible=True)
 
-                # with gr.Row():
-                    # height does not work [a bug]
-                mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out") #.style(height=800)
+                mesh_output = gr.Model3D(clear_color=[0.0, 0.0, 0.0, 0.0], label="One-2-3-45's Textured Mesh", elem_id="model-3d-out")
         
         with gr.Row(variant='panel'):
             with gr.Column(scale=0.85):
                 with gr.Row():
-                    # with gr.Column(scale=8):
-                    elev_output = gr.Label(label='Estimated elevation / polar angle of the input image (degree, w.r.t. the Z axis)')
-                    # with gr.Column(scale=1):
-                    #     theta_output = gr.Image(value="./theta_mini.png", interactive=False, show_label=False).style(width=100)
+                    elev_output = gr.Label(label='Estimated elevation (degree, w.r.t. the horizontal plane)')
                 vis_output = gr.Plot(
                     label='Camera poses of the input view (red) and predicted views (blue)')
                 
@@ -691,10 +684,8 @@ def run_demo(
         # make regen_btn visible when any of the btn_retry is checked
         for btn_retry in btn_retrys:
             # Add the event handlers to the btn_retry buttons
-            # btn_retry.change(fn=on_retry_button_click, inputs=[*btn_retrys], outputs=regen_btn)
             btn_retry.change(fn=on_retry_button_click, inputs=[*btn_retrys], outputs=[regen_view_btn, regen_mesh_btn])
 
-        
 
         run_btn.click(fn=partial(update_guide, _SAM), outputs=[guide_text]
                       ).success(fn=partial(preprocess_run, predictor, models), 
@@ -712,7 +703,7 @@ def run_demo(
     
 
         regen_view_btn.click(fn=partial(stage1_run, models, device, None),
-                             inputs=[tmp_dir, sam_block, scale_slider, steps_slider, rerun_idx, *btn_retrys],
+                             inputs=[tmp_dir, sam_block, scale_slider, steps_slider, elev_output, rerun_idx, *btn_retrys],
                              outputs=[rerun_idx, *btn_retrys, *views]
                             ).success(fn=partial(update_guide, _REGEN_1), outputs=[guide_text])
         regen_mesh_btn.click(fn=partial(stage2_run, models, device),
