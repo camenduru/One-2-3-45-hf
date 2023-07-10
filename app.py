@@ -30,10 +30,7 @@ import torch
 import fire
 import gradio as gr
 import numpy as np
-# import plotly.express as px
 import plotly.graph_objects as go
-# import rich
-import sys
 from functools import partial
 
 from lovely_numpy import lo
@@ -272,12 +269,13 @@ def stage1_run(models, device, cam_vis, tmp_dir,
             output_ims_2 = predict_stage1_gradio(models['turncam'], input_im, save_path=stage1_dir, adjust_set=list(range(4,8)), device=device, ddim_steps=ddim_steps, scale=scale)
         else:
             output_ims_2 = predict_stage1_gradio(models['turncam'], input_im, save_path=stage1_dir, adjust_set=list(range(8,12)), device=device, ddim_steps=ddim_steps, scale=scale)
+        torch.cuda.empty_cache()
         return (90-elev_output, new_fig, *output_ims, *output_ims_2)
     else:
         rerun_idx = [i for i in range(len(btn_retrys)) if btn_retrys[i]]
         # elev_output = estimate_elev(tmp_dir)
         # if elev_output > 75:
-        if 90-elev >75:
+        if 90-elev > 75:
             rerun_idx_in = [i if i < 4 else i+4 for i in rerun_idx]
         else:
             rerun_idx_in = rerun_idx
@@ -290,6 +288,7 @@ def stage1_run(models, device, cam_vis, tmp_dir,
         for idx, view_idx in enumerate(rerun_idx):
             outputs[view_idx] = output_ims[idx]
         reset = [gr.update(value=False)] * 8
+        torch.cuda.empty_cache()
         return (rerun_all, *reset, *outputs)
     
 def stage2_run(models, device, tmp_dir,
@@ -309,6 +308,7 @@ def stage2_run(models, device, tmp_dir,
     dataset = tmp_dir
     main_dir_path = os.path.dirname(os.path.abspath(
             inspect.getfile(inspect.currentframe())))
+    torch.cuda.empty_cache()
     os.chdir(os.path.join(code_dir, 'SparseNeuS_demo_v1/'))
 
     bash_script = f'CUDA_VISIBLE_DEVICES={_GPU_INDEX} python exp_runner_generic_blender_val.py --specific_dataset_name {dataset} --mode export_mesh --conf confs/one2345_lod0_val_demo.conf  --is_continue'
@@ -333,6 +333,7 @@ def stage2_run(models, device, tmp_dir,
     mesh.faces = np.fliplr(mesh.faces)
     # Export the mesh as .obj file with colors
     mesh.export(mesh_path, file_type='obj', include_color=True)
+    torch.cuda.empty_cache()
 
     if not is_rerun:
         return (mesh_path)
@@ -344,6 +345,7 @@ def nsfw_check(models, raw_im, device='cuda'):
     (_, has_nsfw_concept) = models['nsfw'](
         images=np.ones((1, 3)), clip_input=safety_checker_input.pixel_values)
     print('has_nsfw_concept:', has_nsfw_concept)
+    del safety_checker_input
     if np.any(has_nsfw_concept):
         print('NSFW content detected.')
         # Define the image size and background color
@@ -372,6 +374,7 @@ def preprocess_run(predictor, models, raw_im, preprocess, *bbox_sliders):
         return check_results
     image_sam = sam_out_nosave(predictor, raw_im.convert("RGB"), *bbox_sliders)
     input_256 = image_preprocess_nosave(image_sam, lower_contrast=preprocess, rescale=True)
+    torch.cuda.empty_cache()
     return input_256
 
 def calc_cam_cone_pts_3d(polar_deg, azimuth_deg, radius_m, fov_deg):
