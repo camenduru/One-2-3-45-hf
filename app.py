@@ -430,9 +430,10 @@ def preprocess_run(predictor, models, raw_im, preprocess, *bbox_sliders):
 def on_coords_slider(image, x_min, y_min, x_max, y_max, color=(88, 191, 131, 255)):
     """Draw a bounding box annotation for an image."""
     print("on_coords_slider, drawing bbox...")
+    image.thumbnail([512, 512], Image.Resampling.LANCZOS)
     image_size = image.size
-    if max(image_size) > 180:
-        image.thumbnail([180, 180], Image.Resampling.LANCZOS)
+    if max(image_size) > 224:
+        image.thumbnail([224, 224], Image.Resampling.LANCZOS)
         shrink_ratio = max(image.size) / max(image_size)
         x_min = int(x_min * shrink_ratio)
         y_min = int(y_min * shrink_ratio)
@@ -455,7 +456,7 @@ def init_bbox(image):
     x_max = int(x_nonzero[0].max())
     y_max = int(y_nonzero[0].max())
     image_mini = image.copy()
-    image_mini.thumbnail([180, 180], Image.Resampling.LANCZOS)
+    image_mini.thumbnail([224, 224], Image.Resampling.LANCZOS)
     shrink_ratio = max(image_mini.size) / max(width, height)
     x_min_shrink = int(x_min * shrink_ratio)
     y_min_shrink = int(y_min * shrink_ratio)
@@ -506,6 +507,7 @@ def run_demo(
                     outputs=[image_block],
                     cache_examples=False,
                     label='Examples (click one of the images below to start)',
+                    examples_per_page=40
                 )
                 
                 with gr.Accordion('Advanced options', open=False):
