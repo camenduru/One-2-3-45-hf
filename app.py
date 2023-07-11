@@ -55,8 +55,8 @@ _BBOX_1 = "Predicting bounding box for the input image..."
 _BBOX_2 = "Bounding box adjusted. Continue adjusting or **Run Generation**."
 _BBOX_3 = "Bounding box predicted. Adjust it using sliders or **Run Generation**."
 _SAM = "Preprocessing the input image... (safety check, SAM segmentation, *etc*.)"
-_GEN_1 = "Predicting multi-view images... (may take \~21 seconds) <br> Images will be shown in the bottom right blocks."
-_GEN_2 = "Predicting nearby views and generating mesh... (may take \~43 seconds) <br> Mesh will be shown on the right."
+_GEN_1 = "Predicting multi-view images... (may take \~13 seconds) <br> Images will be shown in the bottom right blocks."
+_GEN_2 = "Predicting nearby views and generating mesh... (may take \~35 seconds) <br> Mesh will be shown on the right."
 _DONE = "Done! Mesh is shown on the right. <br> If it is not satisfactory, please select **Retry view** checkboxes for inaccurate views and click **Regenerate selected view(s)** at the bottom."
 _REGEN_1 = "Selected view(s) are regenerated. You can click **Regenerate nearby views and mesh**. <br> Alternatively, if the regenerated view(s) are still not satisfactory, you can repeat the previous step (select the view and regenerate)."
 _REGEN_2 = "Regeneration done. Mesh is shown on the right."
@@ -586,13 +586,13 @@ def run_demo(
         tmp_func = lambda x: False if not x else gr.update(visible=False)
         disable_func = lambda x: gr.update(interactive=False)
         enable_func = lambda x: gr.update(interactive=True)
-        image_block.change(disable_func, inputs=run_btn, outputs=run_btn
+        image_block.change(disable_func, inputs=run_btn, outputs=run_btn, queue=False
                            ).success(fn=refresh,
                            inputs=[tmp_dir],
-                           outputs=[tmp_dir, rerun_idx, bbox_block, sam_block, elev_output, vis_output, mesh_output, regen_view_btn, regen_mesh_btn, *views, *btn_retrys]
-                        #    ).success(disable_func, inputs=run_btn, outputs=run_btn
-                           ).success(fn=tmp_func, inputs=[image_block], outputs=[placeholder]
-                           ).success(fn=partial(update_guide, _BBOX_1), outputs=[guide_text]
+                           outputs=[tmp_dir, rerun_idx, bbox_block, sam_block, elev_output, vis_output, mesh_output, regen_view_btn, regen_mesh_btn, *views, *btn_retrys],
+                           queue=False
+                           ).success(fn=tmp_func, inputs=[image_block], outputs=[placeholder], queue=False
+                           ).success(fn=partial(update_guide, _BBOX_1), outputs=[guide_text], queue=False
                            ).success(fn=init_bbox,
                                      inputs=[image_block],
                                      outputs=[bbox_block, *bbox_sliders]
