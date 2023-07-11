@@ -44,11 +44,17 @@ from rembg import remove
 
 _GPU_INDEX = 0
 
-_TITLE = 'One-2-3-45: Any Single Image to 3D Mesh in 45 Seconds without Per-Shape Optimization'
+_TITLE = '''One-2-3-45: Any Single Image to 3D Mesh in 45 Seconds without Per-Shape Optimization'''
 
 _DESCRIPTION = '''
-We reconstruct a 3D textured mesh from a single image by initially predicting multi-view images and then lifting them to 3D.
+We reconstruct a 3D textured mesh from a single image by initially predicting multi-view images and then lifting them to 3D. 
+[<a href="http://One-2-3-45.com">Project</a>] 
+[<a href="https://github.com/One-2-3-45/One-2-3-45">GitHub</a>] 
 '''
+# _HTML = '''<p>[<a href="https://github.com/One-2-3-45/One-2-3-45">GitHub</a>] 
+# <object alt="GitHub Repo stars" src="https://img.shields.io/github/stars/One-2-3-45/One-2-3-45?style=social&link=https%3A%2F%2Fgithub.com%2FOne-2-3-45%2FOne-2-3-45">
+# </p>'''
+# _HTML = '<script async defer src="https://buttons.github.io/buttons.js"></script> <a class="github-button" href="https://github.com/One-2-3-45/One-2-3-45" data-icon="octicon-star" data-show-count="true" aria-label="Star One-2-3-45/One-2-3-45 on GitHub">Star</a><p>'
 
 _USER_GUIDE = "Please upload an image in the block above (or choose an example above) and click **Run Generation**." 
 _BBOX_1 = "Predicting bounding box for the input image..."
@@ -496,6 +502,7 @@ def run_demo(
     with gr.Blocks(title=_TITLE, css=css) as demo:
         gr.Markdown('# ' + _TITLE)
         gr.Markdown(_DESCRIPTION)
+        # gr.HTML(_HTML)
 
         with gr.Row(variant='panel'):
             with gr.Column(scale=1.2):
