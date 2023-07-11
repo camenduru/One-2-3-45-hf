@@ -595,16 +595,17 @@ def run_demo(
                            ).success(fn=partial(update_guide, _BBOX_1), outputs=[guide_text], queue=False
                            ).success(fn=init_bbox,
                                      inputs=[image_block],
-                                     outputs=[bbox_block, *bbox_sliders]
-                           ).success(fn=partial(update_guide, _BBOX_3), outputs=[guide_text]
-                           ).success(enable_func, inputs=run_btn, outputs=run_btn)
+                                     outputs=[bbox_block, *bbox_sliders], queue=False
+                           ).success(fn=partial(update_guide, _BBOX_3), outputs=[guide_text], queue=False
+                           ).success(enable_func, inputs=run_btn, outputs=run_btn, queue=False)
 
 
         for bbox_slider in bbox_sliders:
             bbox_slider.release(fn=on_coords_slider,
                                inputs=[image_block, *bbox_sliders],
-                               outputs=[bbox_block]
-                               ).success(fn=partial(update_guide, _BBOX_2), outputs=[guide_text])
+                               outputs=[bbox_block], 
+                               queue=False
+                               ).success(fn=partial(update_guide, _BBOX_2), outputs=[guide_text], queue=False)
 
         cam_vis = CameraVisualizer(vis_output)
 
@@ -624,7 +625,7 @@ def run_demo(
             btn_retry.change(fn=on_retry_button_click, inputs=[*btn_retrys], outputs=[regen_view_btn, regen_mesh_btn])
 
 
-        run_btn.click(fn=partial(update_guide, _SAM), outputs=[guide_text]
+        run_btn.click(fn=partial(update_guide, _SAM), outputs=[guide_text], queue=False
                       ).success(fn=partial(preprocess_run, predictor, models), 
                                 inputs=[image_block, preprocess_chk, *bbox_sliders], 
                                 outputs=[sam_block]
