@@ -509,10 +509,9 @@ def run_demo(
                     label='Examples (click one of the images below to start)',
                     examples_per_page=40
                 )
-                
-                with gr.Accordion('Advanced options', open=False):
-                    preprocess_chk = gr.Checkbox(
+                preprocess_chk = gr.Checkbox(
                         False, label='Reduce image contrast (mitigate shadows on the backside)')
+                with gr.Accordion('Advanced options', open=False):
                     scale_slider = gr.Slider(0, 30, value=3, step=1,
                                              label='Diffusion guidance scale')
                     steps_slider = gr.Slider(5, 200, value=75, step=5,
@@ -587,10 +586,11 @@ def run_demo(
         tmp_func = lambda x: False if not x else gr.update(visible=False)
         disable_func = lambda x: gr.update(interactive=False)
         enable_func = lambda x: gr.update(interactive=True)
-        image_block.change(fn=refresh,
+        image_block.change(disable_func, inputs=run_btn, outputs=run_btn
+                           ).success(fn=refresh,
                            inputs=[tmp_dir],
                            outputs=[tmp_dir, rerun_idx, bbox_block, sam_block, elev_output, vis_output, mesh_output, regen_view_btn, regen_mesh_btn, *views, *btn_retrys]
-                           ).success(disable_func, inputs=run_btn, outputs=run_btn
+                        #    ).success(disable_func, inputs=run_btn, outputs=run_btn
                            ).success(fn=tmp_func, inputs=[image_block], outputs=[placeholder]
                            ).success(fn=partial(update_guide, _BBOX_1), outputs=[guide_text]
                            ).success(fn=init_bbox,
@@ -649,7 +649,7 @@ def run_demo(
                             ).success(fn=partial(update_guide, _REGEN_2), outputs=[guide_text])
 
 
-    demo.launch(enable_queue=True, share=False, max_threads=80, auth=("admin", "7wQ@>1ga}NNmdLh-N]0*"))
+    demo.launch(enable_queue=True, share=False, max_threads=80, auth=("admin", os.environ['PASSWD']))
 
 
 if __name__ == '__main__':
