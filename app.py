@@ -636,25 +636,25 @@ def run_demo(
                       ).success(fn=partial(preprocess_run, predictor, models), 
                                 inputs=[image_block, preprocess_chk, *bbox_sliders], 
                                 outputs=[sam_block]
-                      ).success(fn=partial(update_guide, _GEN_1), outputs=[guide_text]
+                      ).success(fn=partial(update_guide, _GEN_1), outputs=[guide_text], queue=False
                       ).success(fn=partial(stage1_run, models, device, cam_vis),
                                 inputs=[tmp_dir, sam_block, scale_slider, steps_slider],
                                 outputs=[elev_output, vis_output, *views]
-                      ).success(fn=partial(update_guide, _GEN_2), outputs=[guide_text]
+                      ).success(fn=partial(update_guide, _GEN_2), outputs=[guide_text], queue=False
                       ).success(fn=partial(stage2_run, models, device),
                                 inputs=[tmp_dir, elev_output, scale_slider],
                                 outputs=[mesh_output]
-                      ).success(fn=partial(update_guide, _DONE), outputs=[guide_text])
+                      ).success(fn=partial(update_guide, _DONE), outputs=[guide_text], queue=False)
     
 
         regen_view_btn.click(fn=partial(stage1_run, models, device, None),
                              inputs=[tmp_dir, sam_block, scale_slider, steps_slider, elev_output, rerun_idx, *btn_retrys],
                              outputs=[rerun_idx, *btn_retrys, *views]
-                            ).success(fn=partial(update_guide, _REGEN_1), outputs=[guide_text])
+                            ).success(fn=partial(update_guide, _REGEN_1), outputs=[guide_text], queue=False)
         regen_mesh_btn.click(fn=partial(stage2_run, models, device),
                              inputs=[tmp_dir, elev_output, scale_slider, rerun_idx],
                              outputs=[mesh_output, rerun_idx, regen_view_btn, regen_mesh_btn]
-                            ).success(fn=partial(update_guide, _REGEN_2), outputs=[guide_text])
+                            ).success(fn=partial(update_guide, _REGEN_2), outputs=[guide_text], queue=False)
 
 
     demo.launch(enable_queue=True, share=False, max_threads=80) # auth=("admin", os.environ['PASSWD'])
