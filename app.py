@@ -629,7 +629,7 @@ def run_demo(
         # make regen_btn visible when any of the btn_retry is checked
         for btn_retry in btn_retrys:
             # Add the event handlers to the btn_retry buttons
-            btn_retry.change(fn=on_retry_button_click, inputs=[*btn_retrys], outputs=[regen_view_btn, regen_mesh_btn])
+            btn_retry.change(fn=on_retry_button_click, inputs=[*btn_retrys], outputs=[regen_view_btn, regen_mesh_btn], queue=False)
 
 
         run_btn.click(fn=partial(update_guide, _SAM), outputs=[guide_text], queue=False
