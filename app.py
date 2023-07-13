@@ -657,7 +657,7 @@ def run_demo(
                             ).success(fn=partial(update_guide, _REGEN_2), outputs=[guide_text], queue=False)
 
 
-    demo.launch(enable_queue=True, share=False, max_threads=80) # auth=("admin", os.environ['PASSWD'])
+    demo.launch(enable_queue=True, share=True, max_threads=80) # auth=("admin", os.environ['PASSWD'])
 
 
 if __name__ == '__main__':
