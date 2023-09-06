@@ -1,12 +1,55 @@
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch>=2.0.0
+torchvision
+albumentations>=0.4.3
+opencv-python>=4.5.5.64
+pudb>=2019.2
+imageio>=2.9.0
+imageio-ffmpeg>=0.4.2
+pytorch-lightning>=1.4.2
+omegaconf>=2.1.1
+test-tube>=0.7.5
+streamlit>=0.73.1
+einops>=0.3.0
+torch-fidelity>=0.3.0
+transformers>=4.22.2
+kornia>=0.6
+webdataset>=0.2.5
+torchmetrics>=0.6.0
+fire>=0.4.0
+gradio>=3.41.1
+diffusers>=0.12.1
+datasets[vision]>=2.4.0
+rich>=13.3.2
+plotly>=5.13.1
+-e git+https://github.com/CompVis/taming-transformers.git#egg=taming-transformers
+# elev est
+dl_ext
+loguru
+matplotlib
+Pillow
+PyYAML
+scikit_image
+scikit_learn
+scipy
+setuptools
+tensorboardX
+tqdm
+transforms3d
+trimesh
+yacs
+gdown
+git+https://github.com/NVlabs/nvdiffrast.git
+git+https://github.com/openai/CLIP.git
+# segment anything
+onnxruntime 
+onnx
+git+https://github.com/facebookresearch/segment-anything.git
+# rembg
+rembg
 # sparseneus
 # -e git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0#egg=torchsparse
-opencv_python
-trimesh
-numpy
 pyhocon
 icecream
-tqdm
-scipy
 PyMCubes
 ninja
-# sudo apt-get install libsparsehash-dev
