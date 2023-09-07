@@ -477,6 +477,7 @@ def run_demo(
     examples_full = [os.path.join(example_folder, x) for x in example_fns if x.endswith('.png')]
 
     # Compose demo layout & data flow.
+    print("with gr.Blocks(title=_TITLE, css='style.css') as demo:")
     with gr.Blocks(title=_TITLE, css="style.css") as demo:
         with gr.Row():
             with gr.Column(scale=1):
