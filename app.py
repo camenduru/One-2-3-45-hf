@@ -647,7 +647,7 @@ def run_demo(
                              outputs=[mesh_output, rerun_idx, regen_view_btn, regen_mesh_btn]
                             ).success(fn=partial(update_guide, _REGEN_2), outputs=[guide_text], queue=False)
 
-
+    print("demo.queue().launch(share=True, max_threads=80)")
     demo.queue().launch(share=True, max_threads=80) # auth=("admin", os.environ['PASSWD'])
 
 
