@@ -15,7 +15,7 @@ if not is_local_run:
     pip.main(['install', elev_est_dir])
     # export TORCH_CUDA_ARCH_LIST="7.0;7.2;8.0;8.6"
     # export IABN_FORCE_CUDA=1
-    os.environ["TORCH_CUDA_ARCH_LIST"] = "8.0;8.6"
+    os.environ["TORCH_CUDA_ARCH_LIST"] = "7.5;8.0;8.6"
     os.environ["IABN_FORCE_CUDA"] = "1"
     os.environ["FORCE_CUDA"] = "1"
     pip.main(["install", "inplace_abn"]) 
