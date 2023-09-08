@@ -3,7 +3,7 @@ from huggingface_hub import snapshot_download
 
 is_local_run = False
 
-code_dir = snapshot_download("One-2-3-45/code") if not is_local_run else "../code" # , token=os.environ['TOKEN']
+code_dir = snapshot_download("camenduru/One-2-3-45") if not is_local_run else "../code" # , token=os.environ['TOKEN']
 
 sys.path.append(code_dir)
 
